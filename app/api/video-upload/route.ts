@@ -49,7 +49,7 @@ const prisma = new PrismaClient();
             }
              const bytes=await file.arrayBuffer();
              const buffer=Buffer.from(bytes);
-           const result=  await new Promise<CloudinaryUploadResult>((resolve,reject)=>{
+             const result=  await new Promise<CloudinaryUploadResult>((resolve,reject)=>{
                 const uploadStream=cloudinary.uploader.upload_stream(
                     {
                         resource_type:'video',
@@ -84,6 +84,14 @@ const prisma = new PrismaClient();
                     
                 }
             })
+             return NextResponse.json(
+      {
+        message: 'Video uploaded successfully',
+        video,
+      },
+      { status: 200 }
+    );
+  
         }
         catch(e:any){
             console.log("Video upload failed",e);

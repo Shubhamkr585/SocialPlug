@@ -162,8 +162,8 @@ export default function SocialShare() {
                             onLoad={() => setIsTransforming(false)}
                     ></CldImage>
                               <button
-                            onClick={handleDownload}
-                             className="btn btn-primary"
+                              onClick={handleDownload}
+                               className="btn btn-primary"
                                disabled={isTransforming}
                                                      >
                                   Download Image
