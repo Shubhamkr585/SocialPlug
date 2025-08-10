@@ -1,6 +1,7 @@
 import { v2 as cloudinary } from 'cloudinary';
 import { NextResponse, NextRequest } from 'next/server';
 
+
 import {auth} from '@clerk/nextjs/server';
 
 
@@ -48,7 +49,14 @@ import {auth} from '@clerk/nextjs/server';
                 // uploadStream.write(buffer);
                 uploadStream.end(buffer);
              })
-             return NextResponse.json(result);
+             return NextResponse.json(
+                {
+                    publicId:result.public_id
+                },
+                {
+                    status:200
+                }
+             );
         }
         catch(e:any){
             console.log(e);
