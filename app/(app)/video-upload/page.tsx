@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import axios from "axios";
-import { useRouter } from "next/navigation";
 
 export default function VideoUpload() {
   const [file, setFile] = useState<File | null>(null);
@@ -10,7 +9,6 @@ export default function VideoUpload() {
   const [description, setDescription] = useState("");
   const [isUploading, setIsUploading] = useState(false);
 
-  const router = useRouter();
   const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -30,11 +28,15 @@ export default function VideoUpload() {
 
     try {
       await axios.post("/api/video-upload", formData);
-      alert("Video uploaded successfully!");
-      router.push("/videos");
+
+      alert("✅ Video uploaded successfully!");
+      // Clear inputs for next upload
+      setFile(null);
+      setTitle("");
+      setDescription("");
     } catch (err) {
       console.error("Error uploading video", err);
-      alert("Failed to upload video");
+      alert("❌ Failed to upload video");
     } finally {
       setIsUploading(false);
     }

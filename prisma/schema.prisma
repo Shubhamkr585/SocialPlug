@@ -28,3 +28,4 @@ model Video{
   updatedAt      DateTime @updatedAt
 
 }
+
