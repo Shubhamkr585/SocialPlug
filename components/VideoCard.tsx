@@ -1,13 +1,11 @@
-
 import React, { useState, useCallback } from "react";
 import { getCldImageUrl, getCldVideoUrl } from "next-cloudinary";
-import { Download, Clock, FileDown } from "lucide-react";
+import { Download, Clock } from "lucide-react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { filesize } from "filesize";
+import {filesize} from "filesize";
 
 import { Video } from "../generated/prisma";
-
 
 dayjs.extend(relativeTime);
 
@@ -17,10 +15,11 @@ interface VideoCardProps {
 }
 
 const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const [previewError, setPreviewError] = useState(false);
+  const [isHovered, setIsHovered] = useState<boolean>(false);
+  const [previewError, setPreviewError] = useState<boolean>(false);
 
-  const getThumbnailUrl = useCallback((publicId: string) => {
+  // NOTE: next-cloudinary may not ship types; we cast return to string to avoid implicit any
+  const getThumbnailUrl = useCallback((publicId: string): string => {
     return getCldImageUrl({
       src: publicId,
       width: 400,
@@ -30,42 +29,49 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
       format: "jpg",
       quality: "auto",
       assetType: "video",
-    });
+    }) as string;
   }, []);
 
-  const getFullVideoUrl = useCallback((publicId: string) => {
+  const getFullVideoUrl = useCallback((publicId: string): string => {
     return getCldVideoUrl({
       src: publicId,
       width: 1920,
       height: 1080,
-    });
+    }) as string;
   }, []);
 
-  const getPreviewVideoUrl = useCallback((publicId: string) => {
+  const getPreviewVideoUrl = useCallback((publicId: string): string => {
     return getCldVideoUrl({
       src: publicId,
       width: 400,
       height: 225,
       rawTransformations: ["e_preview:duration_15:max_seg_9:min_seg_dur_1"],
-    });
+    }) as string;
   }, []);
 
-  const formatSize = useCallback((size: number) => {
-    return filesize(size);
+  const formatSize = useCallback((size: number): string => {
+    // 'filesize' may be untyped; casting result to string keeps TypeScript happy
+    return String(filesize(size));
   }, []);
 
-  const compressionPercentage = Math.round(
-    (1 - Number(Number(video.compressedSize) / Number(video.originalSize))) * 100
+  // handle cases where Prisma fields might be string | bigint | number
+  const originalSizeNum: number = Number((video.originalSize ?? 0) as unknown) || 0;
+  const compressedSizeNum: number = Number((video.compressedSize ?? 0) as unknown) || 0;
+
+  const compressionPercentage = originalSizeNum > 0
+    ? Math.round((1 - compressedSizeNum / originalSizeNum) * 100)
+    : 0;
+
+  const handlePreviewError = useCallback(
+    (_e?: React.SyntheticEvent<HTMLVideoElement>) => {
+      setPreviewError(true);
+    },
+    []
   );
-
-  const handlePreviewError = useCallback(() => {
-    setPreviewError(true);
-  }, []);
 
   return (
     <div
-      className="card bg-base-100 shadow-xl hover:shadow-2xl 
-        transition duration-300 ease-in-out overflow-hidden"
+      className="card bg-base-100 shadow-xl hover:shadow-2xl transition duration-300 ease-in-out overflow-hidden"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -94,7 +100,6 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
         )}
       </figure>
 
-      {/* Card body */}
       <div className="p-4 flex flex-col gap-2">
         <h2 className="text-lg font-bold">{video.title}</h2>
         <div className="flex items-center text-sm text-gray-500">
@@ -106,11 +111,11 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
           <div>
             <p>
               <span className="font-semibold">Original:</span>{" "}
-              {formatSize(Number(video.originalSize))}
+              {formatSize(originalSizeNum)}
             </p>
             <p>
               <span className="font-semibold">Compressed:</span>{" "}
-              {formatSize(Number(video.compressedSize))}
+              {formatSize(compressedSizeNum)}
             </p>
           </div>
           <div className="text-green-500 font-bold">
@@ -121,7 +126,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
         <button
           className="btn btn-primary w-full mt-3 flex items-center gap-2"
           onClick={() =>
-            onDownload(getFullVideoUrl(video.publicId), video.title)
+            onDownload(getFullVideoUrl(video.publicId), video.title ?? "download")
           }
         >
           <Download size={18} /> Download
