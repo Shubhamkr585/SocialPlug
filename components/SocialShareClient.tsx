@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
@@ -6,16 +6,17 @@ import { CldImage } from "next-cloudinary";
 
 const socialFormats = {
   "Instagram Square (1:1)": { width: 1080, height: 1080, aspectRatio: "1:1", aspectClass: "aspect-square" },
-  "Instagram Portrait (4:5)": { width: 1080, height: 1350, aspectRatio: "4:5", aspectClass: "aspect-[4/5]" },
-  "Twitter Post (16:9)": { width: 1920, height: 1080, aspectRatio: "16:9", aspectClass: "aspect-[16/9]" },
-  "Twitter Header (3:1)": { width: 1500, height: 500, aspectRatio: "3:1", aspectClass: "aspect-[3/1]" },
-  "Facebook Cover (205:78)": { width: 820, height: 312, aspectRatio: "205:78", aspectClass: "aspect-[205/78]" },
+  "Instagram Portrait (4:5)": { width: 1080, height: 1350, aspectRatio: "4/5", aspectClass: "aspect-[4/5]" },
+  "Twitter Post (16:9)": { width: 1920, height: 1080, aspectRatio: "16/9", aspectClass: "aspect-[16/9]" },
+  "Twitter Header (3:1)": { width: 1500, height: 500, aspectRatio: "3/1", aspectClass: "aspect-[3/1]" },
+  "Facebook Cover (205:78)": { width: 820, height: 312, aspectRatio: "205/78", aspectClass: "aspect-[205/78]" },
 } as const;
 
 type SocialFormatKey = keyof typeof socialFormats;
 
 export default function SocialShareClient() {
-  const [file, setFile] = useState<File | null>(null);
+  // renamed `file` -> `_file` to avoid "assigned but never used" warning
+  const [_file, setFile] = useState<File | null>(null);
   const [uploadedPublicId, setUploadedPublicId] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string>(""); // final transformed URL from img.currentSrc
   const [selectedFormat, setSelectedFormat] = useState<SocialFormatKey>("Instagram Square (1:1)");
@@ -23,7 +24,6 @@ export default function SocialShareClient() {
   const [progress, setProgress] = useState<number>(0);
   const [isTransforming, setIsTransforming] = useState(false);
 
-  // when public id or format changes, show spinner until transformed image loads
   useEffect(() => {
     if (uploadedPublicId) {
       setIsTransforming(true);
@@ -35,6 +35,7 @@ export default function SocialShareClient() {
     const f = e.target.files?.[0];
     if (!f) return;
     setFile(f);
+    setFile(f); // keep setter if you need the file later; `_file` silence prevents lint
 
     const fd = new FormData();
     fd.append("file", f);
@@ -104,7 +105,6 @@ export default function SocialShareClient() {
       <div className="w-full max-w-4xl">
         <h1 className="text-3xl font-bold mb-6 text-center">Social Media Image Creator</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Left: Upload and options */}
           <div className="card bg-base-100 p-6 rounded-lg shadow-lg">
             <h2 className="text-xl font-semibold mb-4">1. Upload</h2>
             <input
@@ -148,7 +148,6 @@ export default function SocialShareClient() {
             </div>
           </div>
 
-          {/* Right: Preview & download */}
           <div className="card bg-base-100 p-6 rounded-lg shadow-lg flex flex-col items-center">
             <h2 className="text-xl font-semibold mb-4">3. Preview & Download</h2>
 
@@ -176,7 +175,7 @@ export default function SocialShareClient() {
                       aspectRatio={currentFormat.aspectRatio}
                       gravity="auto"
                       className={`w-full h-full object-cover transition-opacity duration-300 ${isTransforming ? "opacity-0" : "opacity-100"}`}
-                      onLoad={(e: any) => {
+                      onLoad={(e: React.SyntheticEvent<HTMLImageElement>) => {
                         setImageUrl((e.target as HTMLImageElement).currentSrc || "");
                         setIsTransforming(false);
                       }}
@@ -204,4 +203,3 @@ export default function SocialShareClient() {
     </div>
   );
 }
-
