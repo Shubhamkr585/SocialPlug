@@ -2,9 +2,11 @@ import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 
 const isPublicRoute = createRouteMatcher([
-  '/sign-in',
-  '/sign-up',
-  '/api/videos', // we can treat this as public API if needed
+  '/sign-in(.*)',              // Clerk sign-in routes
+  '/sign-up(.*)',              
+  '/sso-callback(.*)',         
+  '/sign-up/verify(.*)',      
+            
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
@@ -12,22 +14,21 @@ export default clerkMiddleware(async (auth, req) => {
   const url = new URL(req.url);
   const path = url.pathname;
 
-  // Special handling for "/"
+  // Handle root route "/"
   if (path === '/') {
     if (!userId) {
       return NextResponse.redirect(new URL('/sign-in', req.url));
-    } else {
-      return NextResponse.redirect(new URL('/home', req.url));
     }
+    return NextResponse.redirect(new URL('/home', req.url));
   }
 
-  // If not signed in & route is not public
+  // If route is NOT public and user is NOT signed in → redirect to /sign-in
   if (!userId && !isPublicRoute(req)) {
     return NextResponse.redirect(new URL('/sign-in', req.url));
   }
 
-  // If signed in and visiting public route (like /sign-in), send to home
-  if (userId && isPublicRoute(req) && path !== '/api/videos') {
+  // If route is public (except /api/videos) and user IS signed in → redirect to /home
+  if (userId && isPublicRoute(req) && !path.startsWith('/api/videos')) {
     return NextResponse.redirect(new URL('/home', req.url));
   }
 
@@ -36,7 +37,7 @@ export default clerkMiddleware(async (auth, req) => {
 
 export const config = {
   matcher: [
-    '/((?!.*\\..*|_next).*)', // All paths except static files
+    '/((?!.*\\..*|_next).*)', // all routes except static files/_next
     '/',
     '/(api|trpc)(.*)',
   ],
