@@ -107,6 +107,8 @@ The app will be available at **[http://localhost:3000](http://localhost:3000)**.
 
 ## 📸 Screenshots
 *(Add screenshots of your app here)*
+<img width="1917" height="878" alt="image" src="https://github.com/user-attachments/assets/2225e3eb-d148-49cf-bc28-cf253674616d" />
+<img width="1904" height="869" alt="image" src="https://github.com/user-attachments/assets/3d598a7e-9941-4727-b4a8-43359c06745d" />
 
 ---
 
