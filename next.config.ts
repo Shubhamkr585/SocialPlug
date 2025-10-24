@@ -7,4 +7,8 @@ const nextConfig: NextConfig = {
    }
 };
 
+// allow image optimisation
+
+
+
 export default nextConfig;
