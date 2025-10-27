@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import axios from "axios";
+import { toast } from "react-hot-toast";
+
 
 export default function VideoUpload() {
   const [file, setFile] = useState<File | null>(null);
@@ -15,7 +17,7 @@ export default function VideoUpload() {
     e.preventDefault();
     if (!file) return;
     if (file.size > MAX_FILE_SIZE) {
-      alert("File size too large");
+      toast.error("File size too large");
       return;
     }
 
@@ -29,14 +31,19 @@ export default function VideoUpload() {
     try {
       await axios.post("/api/video-upload", formData);
 
-      alert("✅ Video uploaded successfully!");
+      toast.success("Video uploaded successfully", {
+        duration: 3000,
+        icon: "🎉",
+        position: "top-right",
+      });
+
       // Clear inputs for next upload
       setFile(null);
       setTitle("");
       setDescription("");
     } catch (err) {
       console.error("Error uploading video", err);
-      alert("❌ Failed to upload video");
+      toast.error("❌ Failed to upload video");
     } finally {
       setIsUploading(false);
     }

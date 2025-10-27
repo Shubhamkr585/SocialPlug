@@ -72,6 +72,11 @@ const socialFormats = {
             window.URL.revokeObjectURL(url);
             document.body.removeChild(link);
         })
+        .catch((error) => {
+            console.log(error);
+            alert("Failed to download image");
+        });
+        
     }
 
 

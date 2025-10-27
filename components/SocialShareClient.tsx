@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { toast } from "react-hot-toast";
 import { CldImage } from "next-cloudinary";
 
 const socialFormats = {
@@ -35,7 +36,6 @@ export default function SocialShareClient() {
     const f = e.target.files?.[0];
     if (!f) return;
     setFile(f);
-    setFile(f); // keep setter if you need the file later; `_file` silence prevents lint
 
     const fd = new FormData();
     fd.append("file", f);
@@ -61,7 +61,7 @@ export default function SocialShareClient() {
       }
     } catch (err) {
       console.error("Upload failed", err);
-      alert("Upload failed");
+      toast.error("Upload failed");
     } finally {
       setIsUploading(false);
     }
@@ -69,7 +69,7 @@ export default function SocialShareClient() {
 
   const handleDownload = async () => {
     if (!imageUrl) {
-      alert("Preview not ready yet");
+      toast.error("Preview not ready yet");
       return;
     }
     try {
@@ -85,7 +85,7 @@ export default function SocialShareClient() {
       window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error("download error", err);
-      alert("Download failed");
+      toast.error("Download failed");
     }
   };
 

@@ -29,10 +29,13 @@ function Home() {
   }, []);
 
   useEffect(() => {
-    if (isSignedIn) {
+    if (isSignedIn) {   
+      // console.log("home page mounted")
       fetchVideos();
     }
   }, [isSignedIn, fetchVideos]);
+
+ 
 
   const handleDownload = useCallback((url: string, title: string) => {
     const link = document.createElement("a");

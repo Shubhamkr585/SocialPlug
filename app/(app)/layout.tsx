@@ -26,13 +26,8 @@ export default function AppLayout({
 }>) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
-  const router = useRouter();
   const { signOut } = useClerk();
   const { user } = useUser();
-
-  const handleLogoClick = () => {
-    router.push("/");
-  };
 
   const handleSignOut = async () => {
     await signOut();
@@ -60,10 +55,8 @@ export default function AppLayout({
               </label>
             </div>
             <div className="flex-1">
-              <Link href="/" onClick={handleLogoClick}>
-                <div className="btn btn-ghost normal-case text-2xl font-bold tracking-tight cursor-pointer">
-                  Cloudinary Showcase
-                </div>
+              <Link href="/" className="btn btn-ghost normal-case text-2xl font-bold tracking-tight">
+                Cloudinary Showcase
               </Link>
             </div>
             <div className="flex-none flex items-center space-x-4">
@@ -118,16 +111,20 @@ export default function AppLayout({
             {sidebarItems.map((item) => (
               <li key={item.href} className="mb-2">
                 <Link
-                  href={item.href}
-                  className={`flex items-center space-x-4 px-4 py-2 rounded-lg ${
-                    pathname === item.href
-                      ? "bg-primary text-white"
-                      : "hover:bg-base-300"
-                  }`}
-                  onClick={() => setSidebarOpen(false)}
+                  href={item.href} // The Link component handles navigation
+                  className="block" // Make the link a block to contain the label
                 >
-                  <item.icon className="w-6 h-6" />
-                  <span>{item.label}</span>
+                  <label // This label closes the drawer when clicked
+                    htmlFor="sidebar-drawer"
+                    className={`flex items-center space-x-4 px-4 py-2 rounded-lg cursor-pointer ${
+                      pathname === item.href
+                        ? "bg-primary text-white"
+                        : "hover:bg-base-300"
+                    }`}
+                  >
+                    <item.icon className="w-6 h-6" />
+                    <span>{item.label}</span>
+                  </label>
                 </Link>
               </li>
             ))}
